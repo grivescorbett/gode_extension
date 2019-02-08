@@ -1,0 +1,15 @@
+  {
+    "name": "Gode modelling paste helper",
+    "version": "1.0",
+    "description": "Automatically paste into Almaris tables from Excel",
+    "permissions": ["clipboardRead", "contextMenus"],
+    "background": {
+      "scripts": ["background.js", "jquery.js"],
+      "persistent": false
+    },
+    "content_scripts": [{
+        "js": ["jquery.js", "content.js"],
+        "matches": ["http://www.almaris.com/assess*"]
+    }],
+    "manifest_version": 2
+  }
