@@ -5,55 +5,43 @@ function getTable() {
     return $j(root.closest('table'))[0];
 }
 
-function getColumnIdx() {
-    var root = document.activeElement;
-    var parent = $j(root.closest('tr'));
-
-    var containsRoot = parent.children().map((i, td) => {
-        return td.contains(root);
+function getIdxToHeading(table) {
+    var firstRow = $j(table).find('tr')[0];
+    var cols = $j(firstRow).find('td');
+    var idxToHeading = {};
+    cols.map((i, col) => {
+        idxToHeading[i] = col.innerText;
     });
-    return containsRoot.toArray().indexOf(true);
+    return idxToHeading;
 }
 
-function getColumnByIdx(table, idx) {
-    return $j(table).find(`tr td:nth-child(${idx + 1})`);
-}
-
-function getIdxOfCurrentElement(column) {
-    var root = document.activeElement;
-
-    var found = column.map((i, tr) => {
-        return tr.contains(root);
-    }).toArray();
-
-    return found.indexOf(true);
-}
-
-// function getRowsWithInputs(column) {
-//     return column.map((i, tr) => {
-//         return $j(tr).has('input').length > 0;
-//     }).toArray();
-// }
-
-function setInputInTd(td, val) {
-    var input = $j(td).find('input')[0];
-    
-    if (input) {
-        $j(input).val(val);
+function getDataValue(data, attr, col) {
+    for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        if (row['attr'] == attr) {
+            return row[col.trim().toLowerCase()];
+        }
     }
 }
 
 chrome.extension.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action == 'do_paste') {
-        var columnNo = getColumnIdx();
         var table = getTable();
-        var column = getColumnByIdx(table, columnNo);
-        var currentCellIdx = getIdxOfCurrentElement(column);
+        var idxToHeading = getIdxToHeading(table);
 
-        column = column.slice(currentCellIdx);
+        var cells = $j(table).find('input');
 
-        for (var i = 0; i < msg.data.length; i++) {
-            setInputInTd(column[i], msg.data[i]);
-        }
+        cells.map((i, cell) => {
+            var cellRow = $j(cell.closest('tr'))
+            var cellRowName = cellRow.find('td')[0].innerText.trim().toLowerCase();
+            
+            var cellTd = cell.closest('td');
+            var cellRowIdx = cellRow.children().toArray().indexOf(cellTd);
+            var cellColumn = idxToHeading[cellRowIdx].trim().toLowerCase();
+            
+            var dataValue = getDataValue(msg.data, cellRowName, cellColumn);
+
+            $j(cell).val(dataValue);
+        })
     } 
 });

@@ -23,14 +23,39 @@ function getClipboard() {
 
 function parseClipboardHTML(html) {
     var data = $(html).find('tr'); // Get all the rows
-    return data.map((i, row) => {
-        return $(row).find('td')[0].innerText; // Get the text from the first col of each row
+
+     var rows = data.map((i, row) => {
+        return $(row).find('td')[0].innerText.trim();
     });
+    
+    /* console.log(rows); */
+    
+    var cols = $(data[0]).find('td').map((i, col) => {
+        return col.innerText.trim();
+    });
+    
+    /* console.log(cols); */
+    
+    var output = data.slice(1).map((i, row) => {
+        /* console.log(row.children) */;
+        var rowData = {};
+        $(row.children).map((i, name) => {
+            if (i == 0) {
+                rowData['attr'] = name.innerText.toLowerCase().replace(/\n|\r/g, "").replace(/  /g, ' ');
+            } else if (name.innerText.trim()) {
+                rowData[cols[i].toLowerCase()] = name.innerText.toLowerCase();
+            }
+            console.log(rowData);
+        });
+        return rowData;
+    });
+    return output;
 }
 
 function godePasteHandler(info, tab) {
     console.log(info, tab);
     var rawData = getClipboard();
+    console.log(rawData);
     var parsedData = parseClipboardHTML(rawData);
     chrome.tabs.sendMessage(tab.id, {action: 'do_paste', data: parsedData}, (response) => {});
 }
