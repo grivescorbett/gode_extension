@@ -28,16 +28,11 @@ function parseClipboardHTML(html) {
         return $(row).find('td')[0].innerText.trim();
     });
     
-    /* console.log(rows); */
-    
     var cols = $(data[0]).find('td').map((i, col) => {
         return col.innerText.trim();
     });
     
-    /* console.log(cols); */
-    
     var output = data.slice(1).map((i, row) => {
-        /* console.log(row.children) */;
         var rowData = {};
         $(row.children).map((i, name) => {
             if (i == 0) {
@@ -53,9 +48,7 @@ function parseClipboardHTML(html) {
 }
 
 function godePasteHandler(info, tab) {
-    console.log(info, tab);
     var rawData = getClipboard();
-    console.log(rawData);
     var parsedData = parseClipboardHTML(rawData);
     chrome.tabs.sendMessage(tab.id, {action: 'do_paste', data: parsedData}, (response) => {});
 }
@@ -64,7 +57,8 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create(
         {"title" : "Paste to Almaris",
         "id" : "GodePaste_context_menu",
-        "contexts" : ["editable"]      
+        "contexts" : ["editable"],
+        'documentUrlPatterns': ['http://www.almaris.com/assess*']
         });
 });
 
