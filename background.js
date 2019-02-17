@@ -58,7 +58,7 @@ chrome.runtime.onInstalled.addListener(() => {
         {"title" : "Paste to Almaris",
         "id" : "GodePaste_context_menu",
         "contexts" : ["editable"],
-        'documentUrlPatterns': ['http://www.almaris.com/assess*']
+        'documentUrlPatterns': ['http://almaris.com/assess*']
         });
 });
 

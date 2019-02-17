@@ -9,7 +9,7 @@
     },
     "content_scripts": [{
         "js": ["jquery.js", "content.js"],
-        "matches": ["http://www.almaris.com/assess*"]
+        "matches": ["http://almaris.com/*"]
     }],
     "manifest_version": 2
   }
